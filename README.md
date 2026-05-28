@@ -1,19 +1,19 @@
 # Car Rental Frontend
 
-This repository contains the frontend for a car rental application built with React, TypeScript, and Vite.
+โปรเจคนี้เป็น frontend ของระบบเช่ารถ ที่สร้างด้วย React, TypeScript และ Vite
 
-## Overview
+## ภาพรวม
 
-The app provides:
+เว็บแอปนี้รองรับ:
 
-- Multi-page car rental UI using React Router
-- User authentication and session handling
-- Admin management for cars
-- Car search and filtering
-- Rental checkout flow
-- Language toggle for English and Thai
+- หน้าเว็บหลายหน้าโดยใช้ React Router
+- ระบบล็อกอิน / ลงทะเบียนผู้ใช้
+- หน้าสำหรับผู้ดูแลระบบจัดการรถ
+- ค้นหาและกรองรถยนต์
+- กระบวนการเช่ารถและดูประวัติการเช่า
+- ปุ่มสลับภาษาอังกฤษและไทย
 
-The frontend interacts with a local backend in `car-rental-backend/`.
+ฝั่ง frontend จะเชื่อมต่อกับ backend ภายในโฟลเดอร์ `car-rental-backend/`
 
 ## Tech Stack
 
@@ -23,26 +23,27 @@ The frontend interacts with a local backend in `car-rental-backend/`.
 - React Router DOM
 - ESLint
 
-## Project Structure
+## โครงสร้างโปรเจคหลัก
 
 - `src/`
-  - `App.tsx` - main app routes and provider
-  - `i18n.jsx` - language context and translation data
-  - `components/` - reusable UI components
-  - `Pages/` - screen-level pages
-  - `services/api.js` - API client for backend requests
-- `public/` - static assets
-- `car-rental-backend/` - backend server and API
+  - `App.tsx` - กำหนดเส้นทางของแอป (routes) และ provider หลัก
+  - `i18n.jsx` - คอนเท็กซ์ภาษาพร้อมคำแปลภาษาอังกฤษ/ไทย
+  - `AuthContext.jsx` - คอนเท็กซ์จัดการสถานะผู้ใช้
+  - `components/` - คอมโพเนนต์ UI ที่ใช้ซ้ำได้ เช่น `Navbar`, `CarCard`, `ProtectedRoute`
+  - `Pages/` - หน้าจอหลักของแอป เช่น `Dashboard`, `Login`, `Register`, `Cars`, `Rent`, `MyRentals`, `Profile`
+  - `services/api.js` - ตัวเรียกใช้งาน API กับ backend
+- `public/` - ไฟล์สาธารณะและ static assets
+- `car-rental-backend/` - เซิร์ฟเวอร์ backend และ API (Express)
 
-## Getting Started
+## การติดตั้งและรัน
 
-### 1. Install frontend dependencies
+### 1. ติดตั้ง dependencies frontend
 
 ```bash
 npm install
 ```
 
-### 2. Install backend dependencies
+### 2. ติดตั้ง dependencies backend
 
 ```bash
 cd car-rental-backend
@@ -50,54 +51,53 @@ npm install
 cd ..
 ```
 
-### 3. Run the backend server
+### 3. รัน backend
 
 ```bash
 cd car-rental-backend
 npm run dev
 ```
 
-If the backend runs successfully, it will listen on the configured port (default from `server.js`).
+จากนั้น backend จะเริ่มทำงานบนพอร์ตที่กำหนดใน `server.js`
 
-### 4. Run the frontend
+### 4. รัน frontend
 
 ```bash
 npm run dev
 ```
 
-Then open the local Vite URL provided in the terminal.
+แล้วเปิด URL ที่ Vite แสดงในเทอร์มินัล
 
-## Build
+## คำสั่งสำคัญ
 
-To build the frontend for production:
+- `npm run dev` - รัน frontend ในโหมดพัฒนา
+- `npm run build` - สร้างไฟล์สำหรับ production
+- `npm run lint` - ตรวจสอบโค้ดด้วย ESLint
+- `npm run format` - จัดรูปแบบโค้ดด้วย Prettier
 
-```bash
-npm run build
-```
+## ข้อมูลหน้าโค้ดหลัก
 
-## Linting
+- `src/App.tsx` - กำหนดเส้นทาง
+- `src/i18n.jsx` - คำแปลภาษา
+- `src/AuthContext.jsx` - จัดการ session ผู้ใช้
+- `src/Pages/Dashboard.jsx` - หน้าหลัก
+- `src/Pages/Login.jsx` - หน้าล็อกอิน
+- `src/Pages/Register.jsx` - หน้าสมัครสมาชิก
+- `src/Pages/Cars.jsx` - หน้าแสดงรถทั้งหมด
+- `src/Pages/Rent.jsx` - หน้าเช่ารถ
+- `src/Pages/MyRentals.jsx` - ดูประวัติการเช่า
+- `src/Pages/Profile.jsx` - จัดการข้อมูลโปรไฟล์
+- `src/components/ProtectedRoute.jsx` - ป้องกันหน้าเฉพาะผู้ใช้งานที่ล็อกอินแล้ว
+- `src/services/api.js` - เรียก API ไปยัง backend
 
-To run ESLint on the frontend codebase:
+## คำอธิบายสั้น ๆ ของโปรเจค
 
-```bash
-npm run lint
-```
+ระบบ frontend สำหรับเว็บเช่ารถที่มี:
 
-## Localization
+- หน้าแสดงรถและฟิลเตอร์
+- การล็อกอิน/ลงทะเบียน
+- การจัดการเช่ารถและดูประวัติการเช่า
+- ระบบแอดมินสำหรับจัดการรถ
+- รองรับภาษาอังกฤษและไทย
 
-The app provides a language switcher in the header. It toggles between:
-
-- English
-- Thai
-
-Text translations are managed in `src/i18n.jsx`.
-
-## Notes
-
-- The frontend is configured as a Vite project with React and TypeScript support.
-- The backend is a separate Express app under `car-rental-backend/`.
-- Use the language toggle button in the navbar to switch translations across the app.
-
-## License
-
-This project is provided as-is.
+> เป็นโปรเจคเรียนรู้ที่ใช้ React + TypeScript + Vite และเชื่อมต่อกับ backend Express ในโฟลเดอร์ `car-rental-backend/`
