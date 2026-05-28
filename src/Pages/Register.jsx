@@ -1,15 +1,13 @@
 import Navbar from "../components/Navbar";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { authAPI } from "../services/api";
 import { useLanguage } from "../i18n";
+import { useAuth } from "../AuthContext";
 import "../App.css";
 
 export default function Register() {
   const [form, setForm] = useState({
     username: "",
-    email: "",
-    phone: "",
     password: "",
     confirmPassword: "",
   });
@@ -17,6 +15,7 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const { register } = useAuth();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -24,8 +23,8 @@ export default function Register() {
   };
 
   const handleSubmit = async () => {
-    const { username, email, phone, password, confirmPassword } = form;
-    if (!username || !email || !phone || !password || !confirmPassword) {
+    const { username, password, confirmPassword } = form;
+    if (!username || !password || !confirmPassword) {
       setError(t("fillAllFields"));
       return;
     }
@@ -35,7 +34,7 @@ export default function Register() {
     }
     setLoading(true);
     try {
-      await authAPI.register(username, password);
+      await register(username, password);
       navigate("/");
     } catch (err) {
       setError(err.message || t("registrationFailed"));
@@ -57,37 +56,13 @@ export default function Register() {
 
         {error && <div className="alert alert-error">⚠️ {error}</div>}
 
-        <div className="form-row">
-          <div className="form-group">
-            <label className="form-label">{t("username")}</label>
-            <input
-              className="form-input"
-              name="username"
-              placeholder="johndoe"
-              value={form.username}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="form-group">
-            <label className="form-label">{t("phone")}</label>
-            <input
-              className="form-input"
-              name="phone"
-              placeholder="08x-xxx-xxxx"
-              value={form.phone}
-              onChange={handleChange}
-            />
-          </div>
-        </div>
-
         <div className="form-group">
-          <label className="form-label">{t("email")}</label>
+          <label className="form-label">{t("username")}</label>
           <input
             className="form-input"
-            name="email"
-            type="email"
-            placeholder="john@example.com"
-            value={form.email}
+            name="username"
+            placeholder="johndoe"
+            value={form.username}
             onChange={handleChange}
           />
         </div>
@@ -127,7 +102,7 @@ export default function Register() {
         </button>
 
         <p className="form-footer" style={{ marginTop: "20px" }}>
-          {t("dontHaveAccount")} {" "}
+          {t("alreadyHaveAccount")} {" "}
           <Link to="/login">{t("signIn")}</Link>
         </p>
       </div>

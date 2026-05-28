@@ -1,48 +1,57 @@
 import Navbar from "../components/Navbar";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { rentalsAPI, carsAPI, authAPI } from "../services/api";
+import { rentalsAPI, carsAPI } from "../services/api";
 import { useLanguage } from "../i18n";
 import "../App.css";
 
 export default function MyRentals() {
-  const navigate = useNavigate();
   const [rentals, setRentals] = useState([]);
   const [carsMap, setCarsMap] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const { t } = useLanguage();
 
+  const fetchRentals = async () => {
+    try {
+      const [rentalsData, carsData] = await Promise.all([
+        rentalsAPI.getMyRentals(),
+        carsAPI.getAll(),
+      ]);
+
+      setRentals(rentalsData);
+
+      const carMap = {};
+      carsData.forEach((car) => {
+        carMap[car.id] = car;
+      });
+      setCarsMap(carMap);
+    } catch (err) {
+      setError(err.message || t("failedToLoadRentals"));
+    }
+  };
+
+  const handleCancel = async (rentalId) => {
+    try {
+      setError("");
+      await rentalsAPI.cancel(rentalId);
+      setSuccess(t("rentalCancelled"));
+      await fetchRentals();
+    } catch (err) {
+      setError(err.message || t("unableCancelRental"));
+    }
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        await authAPI.getMe();
-      } catch {
-        navigate("/login");
-        return;
-      }
-      try {
-        const [rentalsData, carsData] = await Promise.all([
-          rentalsAPI.getMyRentals(),
-          carsAPI.getAll(),
-        ]);
-
-        setRentals(rentalsData);
-
-        const carMap = {};
-        carsData.forEach((car) => {
-          carMap[car.id] = car;
-        });
-        setCarsMap(carMap);
-      } catch (err) {
-        setError(err.message || t("failedToLoadRentals"));
-      } finally {
-        setLoading(false);
-      }
+    const load = async () => {
+      setLoading(true);
+      await fetchRentals();
+      setLoading(false);
     };
 
-    fetchData();
-  }, [navigate, t]);
+    load();
+  }, [t]);
 
   return (
     <div className="page-wrapper">
@@ -54,6 +63,7 @@ export default function MyRentals() {
         </div>
 
         {error && <div className="alert alert-error">⚠️ {error}</div>}
+        {success && <div className="alert alert-success">✅ {success}</div>}
 
         {loading ? (
           <div className="empty-state">
@@ -94,6 +104,15 @@ export default function MyRentals() {
                   <div style={{ fontSize: "15px", fontWeight: "600", color: "var(--text-primary)" }}>
                     ฿{car?.pricePerDay?.toLocaleString() || "—"}
                   </div>
+                  {rental.status === "active" && (
+                    <button
+                      className="btn-danger btn-sm"
+                      style={{ marginTop: "12px" }}
+                      onClick={() => handleCancel(rental.id)}
+                    >
+                      {t("cancelRental")}
+                    </button>
+                  )}
                 </div>
               );
             })}

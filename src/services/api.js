@@ -15,13 +15,18 @@ export const apiCall = async (endpoint, options = {}) => {
       credentials: "include",
     });
 
+    const text = await response.text();
+    const data = text ? JSON.parse(text) : null;
+
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || "API Error");
+      throw new Error(data?.message || response.statusText || "API Error");
     }
 
-    return await response.json();
+    return data;
   } catch (error) {
+    if (error instanceof SyntaxError) {
+      throw new Error("Unexpected API response format");
+    }
     throw error;
   }
 };
@@ -77,5 +82,18 @@ export const rentalsAPI = {
     }),
 
   getMyRentals: () => apiCall("/rentals/me"),
+
+  cancel: (rentalId) =>
+    apiCall(`/rentals/${rentalId}`, {
+      method: "DELETE",
+    }),
+};
+
+export const userAPI = {
+  changePassword: (currentPassword, newPassword) =>
+    apiCall("/auth/password", {
+      method: "PUT",
+      body: JSON.stringify({ currentPassword, newPassword }),
+    }),
 };
 

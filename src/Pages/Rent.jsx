@@ -2,7 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import { useLanguage } from "../i18n";
-import { carsAPI, rentalsAPI, authAPI } from "../services/api";
+import { carsAPI, rentalsAPI } from "../services/api";
 import "../App.css";
 
 export default function Rent() {
@@ -25,13 +25,6 @@ export default function Rent() {
   useEffect(() => {
     const loadCar = async () => {
       try {
-        await authAPI.getMe();
-      } catch {
-        navigate("/login");
-        return;
-      }
-
-      try {
         const data = await carsAPI.getAll();
         const foundCar = data.find((c) => c.id === Number(id));
         if (!foundCar) {
@@ -46,7 +39,7 @@ export default function Rent() {
     };
 
     loadCar();
-  }, [id, navigate]);
+  }, [id, t]);
 
   if (loading) {
     return (

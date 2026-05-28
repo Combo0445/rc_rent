@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import { Link } from "react-router-dom";
-import { carsAPI, authAPI } from "../services/api";
+import { carsAPI } from "../services/api";
+import { useAuth } from "../AuthContext";
 import { useLanguage } from "../i18n";
 import "../App.css";
 
@@ -20,10 +21,10 @@ export default function Cars() {
   const [error, setError] = useState("");
   const [adminError, setAdminError] = useState("");
   const [adminSuccess, setAdminSuccess] = useState("");
-  const [isAdmin, setIsAdmin] = useState(false);
   const [editingCar, setEditingCar] = useState(null);
   const [carForm, setCarForm] = useState(initialCarForm);
-  const { t } = useLanguage(); // This line is already present in the original file
+  const { t } = useLanguage();
+  const { isAdmin } = useAuth();
 
   useEffect(() => {
     const fetchCars = async () => {
@@ -37,19 +38,7 @@ export default function Cars() {
       }
     };
     fetchCars();
-  }, []);
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const data = await authAPI.getMe();
-        setIsAdmin(data.user?.role === "admin");
-      } catch {
-        setIsAdmin(false);
-      }
-    };
-    fetchUser();
-  }, []);
+  }, [t]);
 
   const types = ["All", ...new Set(cars.map((c) => c.type))];
 
@@ -288,7 +277,7 @@ export default function Cars() {
                             className={car.available ? "btn-success btn-full" : "btn-danger btn-full"}
                             disabled={!car.available}
                           >
-                            {car.available ? "Rent this car →" : "Not Available"}
+                            {car.available ? t("rentThisCar") : t("notAvailable")}
                           </button>
                         </Link>
                         {isAdmin && (

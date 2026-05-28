@@ -1,8 +1,8 @@
 import Navbar from "../components/Navbar";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { authAPI } from "../services/api";
 import { useLanguage } from "../i18n";
+import { useAuth } from "../AuthContext";
 import "../App.css";
 
 export default function Login() {
@@ -11,6 +11,7 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const { login } = useAuth();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -24,10 +25,10 @@ export default function Login() {
     }
     setLoading(true);
     try {
-      await authAPI.login(form.username, form.password);
+      await login(form.username, form.password);
       navigate("/");
     } catch (err) {
-      setError(err.message || (t("loginFailed") || "Login failed. Please try again."));
+      setError(err.message || t("loginFailed") || "Login failed. Please try again.");
     } finally {
       setLoading(false);
     }

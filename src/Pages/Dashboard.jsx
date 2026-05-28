@@ -1,8 +1,9 @@
 import Navbar from "../components/Navbar";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { carsAPI, rentalsAPI, authAPI } from "../services/api";
+import { carsAPI, rentalsAPI } from "../services/api";
 import { useLanguage } from "../i18n";
+import { useAuth } from "../AuthContext";
 import "../App.css";
 
 export default function Dashboard() {
@@ -10,6 +11,7 @@ export default function Dashboard() {
   const [rentals, setRentals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -17,13 +19,9 @@ export default function Dashboard() {
         const carsData = await carsAPI.getAll();
         setCars(carsData);
 
-        // Fetch rentals if user is authenticated
-        try {
-          await authAPI.getMe();
+        if (isAuthenticated) {
           const rentalsData = await rentalsAPI.getMyRentals();
           setRentals(rentalsData);
-        } catch (err) {
-          // Ignore rental fetch error for dashboard
         }
       } catch (err) {
         setError(err.message || "Failed to load data");
@@ -33,7 +31,7 @@ export default function Dashboard() {
     };
 
     fetchData();
-  }, []);
+  }, [isAuthenticated]);
 
   const { t } = useLanguage();
   const totalCars = cars.length;
