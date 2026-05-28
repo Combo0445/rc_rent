@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
-import { Link } from "react-router-dom";
+import CarList from "../components/CarList";
 import { carsAPI } from "../services/api";
 import { useAuth } from "../AuthContext";
 import { useLanguage } from "../i18n";
@@ -44,7 +44,7 @@ export default function Cars() {
 
   const filtered = cars.filter((car) => {
     const matchType = activeType === "All" || car.type === activeType;
-    const matchSearch = car.brand.toLowerCase().includes(search.toLowerCase());
+    const matchSearch = (car.brand || "").toLowerCase().includes(search.toLowerCase());
     return matchType && matchSearch;
   });
 
@@ -240,61 +240,13 @@ export default function Cars() {
                 <div className="empty-state-desc">{t("tryAdjustSearch")}</div>
               </div>
             ) : (
-              <div className="car-grid">
-                {filtered.map((car) => (
-                  <div key={car.id} className="car-card">
-                    <div className="car-card-image">🚗</div>
-                    <div className="car-card-body">
-                      <div className="car-card-header">
-                        <div>
-                          <div className="car-title">{car.brand}</div>
-                          <div className="car-type">{car.type}</div>
-                        </div>
-                        <span className={`badge ${car.available > 0 ? "badge-available" : "badge-unavailable"}`}>
-                          {car.available > 0 ? t("available") : t("soldOut")}
-                        </span>
-                      </div>
-
-                      <div className="car-meta">
-                        <div className="car-meta-item">
-                          <span className="car-meta-label">{t("stock")}</span>
-                          <span className="car-meta-value">{car.available} {t("units")}</span>
-                        </div>
-                        <div className="car-meta-item">
-                          <span className="car-meta-label">{t("type")}</span>
-                          <span className="car-meta-value">{car.type}</span>
-                        </div>
-                      </div>
-
-                      <div className="car-price">
-                        ฿{car.pricePerDay.toLocaleString()}
-                        <span className="car-price-unit"> / day</span>
-                      </div>
-
-                      <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginTop: "16px" }}>
-                        <Link to={`/rent/${car.id}`}>
-                          <button
-                            className={car.available ? "btn-success btn-full" : "btn-danger btn-full"}
-                            disabled={!car.available}
-                          >
-                            {car.available ? t("rentThisCar") : t("notAvailable")}
-                          </button>
-                        </Link>
-                        {isAdmin && (
-                          <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", width: "100%" }}>
-                            <button className="btn-secondary" onClick={() => handleEdit(car)}>
-                                {t("edit")}
-                            </button>
-                            <button className="btn-danger" onClick={() => handleDelete(car.id)}>
-                                {t("delete")}
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <CarList
+                cars={filtered}
+                onRent={null}
+                isAdmin={isAdmin}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+              />
             )}
           </>
         )}

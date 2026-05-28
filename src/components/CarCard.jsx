@@ -2,8 +2,10 @@ import { Link } from "react-router-dom";
 import { useLanguage } from "../i18n";
 import "../App.css";
 
-function CarCard({ car, onRent }) {
+function CarCard({ car, onRent, children }) {
   const { t } = useLanguage();
+  const available = Number(car.available || 0);
+  const price = Number(car.pricePerDay || 0);
   return (
     <div className="car-card">
       <div className="car-card-image">🚗</div>
@@ -13,8 +15,8 @@ function CarCard({ car, onRent }) {
             <div className="car-title">{car.brand}</div>
             <div className="car-type">{car.type}</div>
           </div>
-          <span className={`badge ${car.available > 0 ? "badge-available" : "badge-unavailable"}`}>
-            {car.available > 0 ? t("available") : t("unavailable")}
+          <span className={`badge ${available > 0 ? "badge-available" : "badge-unavailable"}`}>
+            {available > 0 ? t("available") : t("unavailable")}
           </span>
         </div>
 
@@ -30,28 +32,34 @@ function CarCard({ car, onRent }) {
         </div>
 
         <div className="car-price">
-          ฿{car.pricePerDay.toLocaleString()}
+          ฿{price.toLocaleString()}
           <span className="car-price-unit"> / day</span>
         </div>
 
         {onRent ? (
           <button
-            className={car.available ? "btn-success btn-full" : "btn-danger btn-full"}
-            disabled={!car.available}
+            type="button"
+            className={available ? "btn-success btn-full" : "btn-danger btn-full"}
+            disabled={!available}
             onClick={() => onRent(car)}
           >
-            {car.available ? t("rentNow") : t("notAvailable")}
+            {available ? t("rentNow") : t("notAvailable")}
           </button>
         ) : (
-          <Link to={`/rent/${car.id}`}>
-            <button
-              className={car.available ? "btn-success btn-full" : "btn-danger btn-full"}
-              disabled={!car.available}
-            >
-              {car.available ? t("rentNow") : t("notAvailable")}
+          available > 0 ? (
+            <Link to={`/rent/${car.id}`}>
+              <button type="button" className="btn-success btn-full">
+                {t("rentNow")}
+              </button>
+            </Link>
+          ) : (
+            <button type="button" className="btn-danger btn-full" disabled>
+              {t("notAvailable")}
             </button>
-          </Link>
+          )
         )}
+
+        {children}
       </div>
     </div>
   );
